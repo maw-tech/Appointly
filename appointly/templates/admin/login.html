@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Admin login{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-sm-10 col-md-7 col-lg-5 col-xl-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="feature-icon mx-auto mb-3"><i class="bi bi-shield-lock"></i></div>
+          <h1 class="h4 fw-bold mb-1">Administrator login</h1>
+          <p class="text-body-secondary small mb-0">Manage bookings and working hours</p>
+        </div>
+
+        {% if no_admin %}
+          <div class="alert alert-warning small" role="alert">
+            <strong>No administrator account exists yet.</strong> Create one from the project folder with:<br>
+            <code>flask --app appointly create-admin</code>
+          </div>
+        {% endif %}
+        {% if error %}
+          <div class="alert alert-danger d-flex gap-2 small" role="alert">
+            <i class="bi bi-exclamation-octagon-fill"></i><div>{{ error }}</div>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ username }}"
+                   autocomplete="username" required autofocus>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password"
+                   autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Log in</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

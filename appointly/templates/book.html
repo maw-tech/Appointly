@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Choose a time{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-1">Choose a time</h1>
+    <p class="text-body-secondary mb-0">{{ slot_minutes }}-minute appointments · times in {{ timezone_name }}</p>
+  </div>
+  <ol class="steps small mb-0">
+    <li class="active">Time</li><li>Details</li><li>Confirmed</li>
+  </ol>
+</div>
+
+{% if not any_open %}
+  <div class="empty-state text-center p-5 rounded-4 bg-body">
+    <i class="bi bi-calendar-x display-5 text-body-secondary"></i>
+    <h2 class="h5 mt-3">No open times right now</h2>
+    <p class="text-body-secondary mb-0">All upcoming slots are booked or outside working hours. Please check back later.</p>
+  </div>
+{% else %}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h6 text-uppercase text-body-secondary mb-3">1. Select a date</h2>
+      <div class="date-strip" role="list">
+        {% for day, day_slots in overview %}
+          {% set is_selected = day == selected %}
+          <a role="listitem"
+             class="date-chip {{ 'selected' if is_selected }} {{ 'disabled' if not day_slots }}"
+             {% if day_slots %}href="{{ url_for('public.choose_slot', date=day.isoformat()) }}"{% else %}aria-disabled="true"{% endif %}
+             {% if is_selected %}aria-current="date"{% endif %}>
+            <span class="dow">{{ day.strftime('%a') }}</span>
+            <span class="dom">{{ day.day }}</span>
+            <span class="mon">{{ day.strftime('%b') }}</span>
+            <span class="count">{{ day_slots | length }} open</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h2 class="h6 text-uppercase text-body-secondary mb-1">2. Select a time</h2>
+      <p class="fw-semibold mb-3">{{ selected | long_date }}</p>
+      {% if slots %}
+        {% set groups = [('Morning', 'sunrise', '00:00', '12:00'), ('Afternoon', 'sun', '12:00', '17:00'), ('Evening', 'moon-stars', '17:00', '24:00')] %}
+        {% for label, icon, lo, hi in groups %}
+          {% set group_slots = slots | select('ge', lo) | select('lt', hi) | list %}
+          {% if group_slots %}
+            <h3 class="h6 text-body-secondary mt-3 mb-2"><i class="bi bi-{{ icon }} me-1"></i>{{ label }}</h3>
+            <div class="slot-grid">
+              {% for slot in group_slots %}
+                <a class="btn btn-outline-primary slot-btn"
+                   href="{{ url_for('public.booking_form', date=selected.isoformat(), time=slot) }}">{{ slot | ampm }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p class="text-body-secondary mb-0"><i class="bi bi-info-circle me-1"></i>No open times on this day. Please pick another date.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

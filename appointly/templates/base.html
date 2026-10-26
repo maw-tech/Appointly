@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ provider_name }}{% endblock %} · Appointly</title>
+  {{ bootstrap.load_css() }}
+  {{ bootstrap.load_icon_font_css() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand-md app-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('public.index') }}">
+        <span class="brand-mark"><i class="bi bi-calendar2-check"></i></span>
+        <span class="fw-semibold">Appointly</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        {% set endpoint = request.endpoint or '' %}
+        <ul class="navbar-nav ms-auto align-items-md-center gap-md-1">
+          {% if g.admin %}
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint == 'admin.availability' }}" href="{{ url_for('admin.availability') }}">
+                <i class="bi bi-clock me-1"></i>Availability</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint.startswith('public.') and endpoint != 'public.index' }}" href="{{ url_for('public.choose_slot') }}">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Booking page</a>
+            </li>
+            <li class="nav-item ms-md-2">
+              <form method="post" action="{{ url_for('admin.logout') }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-box-arrow-right me-1"></i>Log out {{ g.admin.username }}</button>
+              </form>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint == 'public.index' }}" href="{{ url_for('public.index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint.startswith('public.') and endpoint != 'public.index' }}" href="{{ url_for('public.choose_slot') }}">Book</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{ 'active' if endpoint.startswith('admin.') }}" href="{{ url_for('admin.login') }}">
+                <i class="bi bi-lock me-1"></i>Admin</a>
+            </li>
+            <li class="nav-item ms-md-2">
+              <a class="btn btn-primary btn-sm px-3" href="{{ url_for('public.choose_slot') }}">Book now</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow-1 py-4 py-md-5">
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          {% set icons = {'success': 'check-circle-fill', 'danger': 'exclamation-octagon-fill', 'warning': 'exclamation-triangle-fill', 'info': 'info-circle-fill'} %}
+          <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show d-flex align-items-start gap-2" role="alert">
+            <i class="bi bi-{{ icons.get(category, 'info-circle-fill') }} mt-1"></i>
+            <div>{{ message }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="app-footer py-4 mt-auto">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2 small">
+      <span>&copy; {{ provider_name }} · Powered by Appointly</span>
+      <span><i class="bi bi-globe2 me-1"></i>All times shown in {{ timezone_name }}</span>
+    </div>
+  </footer>
+
+  {{ bootstrap.load_js() }}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

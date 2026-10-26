@@ -1,0 +1,231 @@
+/* Appointly theme - layered on top of Bootstrap 5 */
+:root {
+  --app-primary: #4f46e5;
+  --app-primary-dark: #4338ca;
+  --app-primary-soft: #eef2ff;
+  --app-accent: #0ea5e9;
+  --app-surface: #f6f7fb;
+  --app-text: #1f2937;
+  --bs-primary: var(--app-primary);
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: var(--app-primary);
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color: var(--app-primary-dark);
+  --bs-body-font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+/* ----- Buttons ----- */
+.btn-primary {
+  --bs-btn-bg: var(--app-primary);
+  --bs-btn-border-color: var(--app-primary);
+  --bs-btn-hover-bg: var(--app-primary-dark);
+  --bs-btn-hover-border-color: var(--app-primary-dark);
+  --bs-btn-active-bg: var(--app-primary-dark);
+  --bs-btn-active-border-color: var(--app-primary-dark);
+  --bs-btn-disabled-bg: var(--app-primary);
+  --bs-btn-disabled-border-color: var(--app-primary);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--app-primary);
+  --bs-btn-border-color: #c7d2fe;
+  --bs-btn-hover-bg: var(--app-primary);
+  --bs-btn-hover-border-color: var(--app-primary);
+  --bs-btn-active-bg: var(--app-primary-dark);
+  --bs-btn-active-border-color: var(--app-primary-dark);
+}
+.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--app-primary);
+}
+.nav-pills .nav-link { white-space: nowrap; }
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+  border-color: #a5b4fc;
+  box-shadow: 0 0 0 .25rem rgba(79, 70, 229, .18);
+}
+.form-check-input:checked {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+/* ----- Navigation ----- */
+.app-navbar {
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid #e5e7eb;
+}
+.app-navbar .nav-link { color: #4b5563; border-radius: .5rem; }
+.app-navbar .nav-link:hover { color: var(--app-primary); }
+.app-navbar .nav-link.active { color: var(--app-primary); background: var(--app-primary-soft); font-weight: 600; }
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: .6rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+}
+.app-footer { color: #6b7280; border-top: 1px solid #e5e7eb; background: #fff; }
+
+/* ----- Cards / surfaces ----- */
+.card { border-radius: 1rem; }
+.shadow-sm { box-shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 1px 3px rgba(16, 24, 40, .08) !important; }
+
+.hero {
+  color: #fff;
+  background: radial-gradient(circle at 85% 15%, rgba(255, 255, 255, .18), transparent 40%),
+              linear-gradient(135deg, var(--app-primary) 0%, #6366f1 45%, var(--app-accent) 100%);
+}
+.hero .lead { color: rgba(255, 255, 255, .88); }
+.hours-card { border-radius: 1rem; color: var(--app-text); }
+
+.feature { border: 1px solid #e5e7eb; }
+.feature-icon, .slot-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: .9rem;
+  font-size: 1.35rem;
+  color: var(--app-primary);
+  background: var(--app-primary-soft);
+}
+
+/* ----- Step indicator ----- */
+.steps { display: flex; gap: .5rem; padding: 0; list-style: none; counter-reset: step; }
+.steps li {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  color: #9ca3af;
+}
+.steps li::before {
+  content: counter(step);
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid #d1d5db;
+  font-size: .75rem;
+}
+.steps li + li::after { content: none; }
+.steps li.active { color: var(--app-primary); font-weight: 600; }
+.steps li.active::before { background: var(--app-primary); border-color: var(--app-primary); color: #fff; }
+.steps li.done { color: #059669; }
+.steps li.done::before { content: "\2713"; background: #d1fae5; border-color: #a7f3d0; }
+
+/* ----- Date picker strip ----- */
+.date-strip {
+  display: flex;
+  gap: .6rem;
+  overflow-x: auto;
+  padding-bottom: .4rem;
+  scroll-snap-type: x proximity;
+}
+.date-chip {
+  flex: 0 0 auto;
+  width: 5.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: .65rem .25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: .9rem;
+  text-decoration: none;
+  color: var(--app-text);
+  background: #fff;
+  scroll-snap-align: start;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.date-chip:hover { border-color: #a5b4fc; transform: translateY(-1px); }
+.date-chip .dow { font-size: .75rem; text-transform: uppercase; color: #6b7280; letter-spacing: .04em; }
+.date-chip .dom { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.date-chip .mon { font-size: .8rem; color: #6b7280; }
+.date-chip .count { margin-top: .3rem; font-size: .7rem; font-weight: 600; color: #059669; }
+.date-chip.selected { border-color: var(--app-primary); background: var(--app-primary); color: #fff; box-shadow: 0 4px 14px rgba(79, 70, 229, .3); }
+.date-chip.selected .dow, .date-chip.selected .mon, .date-chip.selected .count { color: rgba(255, 255, 255, .85); }
+.date-chip.disabled { pointer-events: none; background: #f9fafb; color: #c0c4cc; }
+.date-chip.disabled .count, .date-chip.disabled .dow, .date-chip.disabled .mon { color: #c0c4cc; }
+
+/* ----- Time slots ----- */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: .5rem;
+}
+.slot-btn { border-radius: .7rem; padding: .6rem .5rem; font-weight: 500; }
+
+.selected-slot { background: var(--app-primary-soft); border: 1px solid #c7d2fe; }
+
+/* ----- Confirmation ----- */
+.confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  font-size: 2.25rem;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, .35);
+}
+.confirm-icon.cancelled { background: linear-gradient(135deg, #9ca3af, #6b7280); box-shadow: none; }
+.booking-summary { background: var(--app-surface); margin: 0; }
+.booking-summary > div { display: flex; gap: 1rem; padding: .45rem 0; border-bottom: 1px dashed #e5e7eb; }
+.booking-summary > div:last-child { border-bottom: 0; }
+.booking-summary dt { flex: 0 0 6.5rem; font-weight: 500; color: #6b7280; }
+.booking-summary dd { margin: 0; flex: 1; min-width: 0; }
+.text-pre { white-space: pre-line; }
+
+/* ----- Admin ----- */
+.stat-card { border: 1px solid #eef0f4; }
+.appointments-table thead th {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6b7280;
+  background: var(--app-surface);
+  border-bottom: 0;
+}
+.notes-cell { max-width: 16rem; }
+.availability-list .list-group-item.has-error { background: #fff5f5; }
+.day-status { background: #d1fae5; color: #065f46; }
+.closed .day-status { background: #f3f4f6; color: #6b7280; }
+.closed select { opacity: .55; }
+
+.empty-state { border: 1px dashed #d1d5db; }
+
+/* ----- Small screens: stack the reservations table into cards ----- */
+@media (max-width: 767.98px) {
+  .appointments-table thead { display: none; }
+  .appointments-table, .appointments-table tbody { display: block; width: 100%; }
+  .appointments-table tr {
+    display: block;
+    padding: .75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .appointments-table td {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: .75rem;
+    border: 0;
+    padding: .2rem 0;
+    text-align: left;
+    white-space: normal !important;
+  }
+  .appointments-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+  }
+  .appointments-table td:last-child { display: flex; justify-content: flex-end; padding-top: .5rem; }
+  .appointments-table td:last-child::before { content: none; }
+  .notes-cell { max-width: 100%; }
+  .booking-summary dt { flex-basis: 5rem; }
+}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-1">Reservations</h1>
+    <p class="text-body-secondary mb-0">Current time: {{ now_local }} ({{ timezone_name }})</p>
+  </div>
+  <a href="{{ url_for('admin.availability') }}" class="btn btn-outline-primary"><i class="bi bi-clock me-1"></i>Edit availability</a>
+</div>
+
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('Today', counts.today, 'calendar-day', 'primary'),
+    ('Upcoming', counts.upcoming, 'calendar-week', 'success'),
+    ('Cancelled', counts.cancelled, 'calendar-x', 'secondary'),
+    ('All time', counts.total, 'collection', 'info'),
+  ] %}
+  {% for label, value, icon, colour in cards %}
+    <div class="col-6 col-lg-3">
+      <div class="stat-card rounded-4 p-3 h-100 bg-body shadow-sm">
+        <div class="d-flex justify-content-between align-items-start">
+          <span class="text-body-secondary small text-uppercase">{{ label }}</span>
+          <i class="bi bi-{{ icon }} text-{{ colour }} fs-5"></i>
+        </div>
+        <div class="fs-2 fw-bold">{{ value }}</div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-3">
+      <ul class="nav nav-pills flex-nowrap overflow-auto">
+        {% for v in views %}
+          <li class="nav-item">
+            <a class="nav-link {{ 'active' if v == view }}" href="{{ url_for('admin.dashboard', view=v, q=search or None) }}">{{ v | capitalize }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+      <form class="d-flex gap-2" method="get" role="search">
+        <input type="hidden" name="view" value="{{ view }}">
+        <input class="form-control" type="search" name="q" value="{{ search }}" placeholder="Search name or email" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i><span class="visually-hidden">Search</span></button>
+      </form>
+    </div>
+
+    {% if appointments %}
+      <div class="table-responsive">
+        <table class="table align-middle appointments-table mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+              <tr>
+                <td data-label="Date" class="text-nowrap"><div>{{ a.appointment_date | short_date }}<span class="d-none d-xl-inline text-body-secondary">, {{ a.appointment_date[:4] }}</span></div></td>
+                <td data-label="Time" class="text-nowrap"><div>{{ a.start_time | ampm }} – {{ end_time_of(a.start_time) | ampm }}</div></td>
+                <td data-label="Customer">
+                  <div>
+                    <span class="fw-medium">{{ a.customer_name }}</span>
+                    {% if a.notes %}<div class="small text-body-secondary text-truncate notes-cell" title="{{ a.notes }}"><i class="bi bi-chat-left-text me-1"></i>{{ a.notes }}</div>{% endif %}
+                  </div>
+                </td>
+                <td data-label="Email" class="text-break"><div><a href="mailto:{{ a.customer_email }}">{{ a.customer_email }}</a></div></td>
+                <td data-label="Status"><div>
+                  {% if a.status == 'cancelled' %}
+                    <span class="badge text-bg-secondary">Cancelled</span>
+                  {% elif (a.appointment_date ~ ' ' ~ a.start_time) < now_local %}
+                    <span class="badge text-bg-light border">Completed</span>
+                  {% else %}
+                    <span class="badge text-bg-success">Booked</span>
+                  {% endif %}
+                  {% if a.id in outside_hours %}
+                    <span class="badge text-bg-warning" title="Outside current working hours">Outside hours</span>
+                  {% endif %}
+                </div></td>
+                <td class="text-end">
+                  {% if a.status == 'booked' %}
+                    <form method="post" action="{{ url_for('admin.cancel', appointment_id=a.id) }}" class="d-inline"
+                          data-confirm="Cancel {{ a.customer_name }}'s appointment on {{ a.appointment_date }} at {{ a.start_time }}?">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <input type="hidden" name="view" value="{{ view }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                    </form>
+                  {% else %}
+                    <span class="text-body-secondary small">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state text-center py-5">
+        <i class="bi bi-inbox display-6 text-body-secondary"></i>
+        <p class="mt-2 mb-0 text-body-secondary">
+          {% if search %}No appointments match “{{ search }}”.{% else %}No {{ view if view != 'all' }} appointments yet.{% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

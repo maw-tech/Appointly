@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Your details{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <a href="{{ url_for('public.choose_slot', date=day.isoformat()) }}" class="link-secondary small text-decoration-none">
+      <i class="bi bi-arrow-left me-1"></i>Choose a different time</a>
+    <div class="d-flex justify-content-between align-items-end mt-2 mb-4 gap-2 flex-wrap">
+      <h1 class="h2 fw-bold mb-0">Your details</h1>
+      <ol class="steps small mb-0">
+        <li class="done">Time</li><li class="active">Details</li><li>Confirmed</li>
+      </ol>
+    </div>
+
+    <div class="selected-slot rounded-4 p-3 mb-4 d-flex align-items-center gap-3">
+      <div class="slot-icon"><i class="bi bi-calendar-event"></i></div>
+      <div>
+        <div class="fw-semibold">{{ day | long_date }}</div>
+        <div class="text-body-secondary">{{ start | ampm }} – {{ end_time_of(start) | ampm }} · {{ timezone_name }}</div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="post" action="{{ url_for('public.create_booking') }}" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="date" value="{{ day.isoformat() }}">
+          <input type="hidden" name="time" value="{{ start }}">
+
+          <div class="mb-3">
+            <label for="name" class="form-label">Full name <span class="text-danger">*</span></label>
+            <input type="text" id="name" name="name" maxlength="80" autocomplete="name" required
+                   class="form-control form-control-lg {{ 'is-invalid' if errors.name }}"
+                   value="{{ values.name or '' }}" placeholder="e.g. Alex Morgan">
+            {% if errors.name %}<div class="invalid-feedback">{{ errors.name }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>
+            <input type="email" id="email" name="email" maxlength="254" autocomplete="email" required
+                   class="form-control form-control-lg {{ 'is-invalid' if errors.email }}"
+                   value="{{ values.email or '' }}" placeholder="name@example.com">
+            {% if errors.email %}<div class="invalid-feedback">{{ errors.email }}</div>
+            {% else %}<div class="form-text">Used only so the provider can contact you about this appointment.</div>{% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label for="notes" class="form-label">Notes <span class="text-body-secondary">(optional)</span></label>
+            <textarea id="notes" name="notes" rows="3" maxlength="500"
+                      class="form-control {{ 'is-invalid' if errors.notes }}"
+                      placeholder="Anything the provider should know beforehand">{{ values.notes or '' }}</textarea>
+            {% if errors.notes %}<div class="invalid-feedback">{{ errors.notes }}</div>{% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-check2-circle me-2"></i>Confirm booking</button>
+          <p class="small text-body-secondary text-center mt-3 mb-0">No payment is required.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

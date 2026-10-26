@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Availability{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <h1 class="h2 fw-bold mb-1">Weekly availability</h1>
+  <p class="text-body-secondary mb-0">Customers can book {{ slot_minutes }}-minute slots inside these hours ({{ timezone_name }}).
+    Changes apply to new bookings; existing appointments are never deleted automatically.</p>
+</div>
+
+<form method="post" class="card border-0 shadow-sm" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card-body p-0">
+    <ul class="list-group list-group-flush availability-list">
+      {% for d in days %}
+        {% set i = d.weekday %}
+        <li class="list-group-item p-3 p-md-4 {{ 'has-error' if errors.get(i) }}" data-day-row>
+          <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-4">
+              <div class="form-check form-switch fs-5 mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="working_{{ i }}" name="working_{{ i }}"
+                       {{ 'checked' if d.is_working }} data-working-toggle>
+                <label class="form-check-label fs-6 fw-semibold" for="working_{{ i }}">{{ weekday_names[i] }}</label>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small text-body-secondary mb-1" for="start_{{ i }}">Start</label>
+              <select class="form-select" id="start_{{ i }}" name="start_{{ i }}" data-time-input>
+                {% for t in options %}<option value="{{ t }}" {{ 'selected' if t == d.start_time }}>{{ t | ampm }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label small text-body-secondary mb-1" for="end_{{ i }}">End</label>
+              <select class="form-select" id="end_{{ i }}" name="end_{{ i }}" data-time-input>
+                {% for t in options %}<option value="{{ t }}" {{ 'selected' if t == d.end_time }}>{{ t | ampm }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-2 text-md-end">
+              <span class="badge rounded-pill day-status" data-day-status>{{ 'Open' if d.is_working else 'Closed' }}</span>
+            </div>
+            {% if errors.get(i) %}
+              <div class="col-12"><div class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>{{ errors[i] }}</div></div>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card-footer bg-body p-3 d-flex justify-content-end gap-2">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">Back to dashboard</a>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save availability</button>
+  </div>
+</form>
+{% endblock %}
